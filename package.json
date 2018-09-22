@@ -1,0 +1,28 @@
+{
+    "name": "node-red-contrib-power-monitor",
+    "version": "0.1.0",
+    "description": "A Node-RED node to monitor home appliances based on their power consumption.",
+    "homepage": "http://github.com/xoseperez/node-red-contrib-power-monitor",
+    "bugs": "http://github.com/xoseperez/node-red-contrib-power-monitor/issues",
+    "license": "Apache-2.0",
+    "author": {
+        "name": "Xose Pérez",
+        "email": "xose.perez@gmail.com",
+        "url": "http://tinkerman.cat"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:xoseperez/node-red-contrib-power-monitor.git"
+    },
+    "keywords": [
+        "node-red",
+        "power",
+        "monitor",
+        "notification"
+    ],
+    "node-red": {
+        "nodes": {
+            "power-monitor": "power-monitor/power-monitor.js"
+        }
+    }
+}
