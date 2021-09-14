@@ -128,9 +128,10 @@
                     node.send([
                         { "payload": {
                             "name": node.name,
-                            "event": "running",
+                            "event": "start",
                             "time": Math.round(time - node.start),
-                            "energy": kwh(node.energy)
+                            "energy": kwh(node.energy),
+                            "energy_delta": kwh(energy)    
                         }},
                         null
                     ]);

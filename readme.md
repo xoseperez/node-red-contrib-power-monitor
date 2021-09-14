@@ -49,12 +49,12 @@ The node will trigger events based on the start and stop conditions with additio
 ### Output
 
 The output will be a JSON object with the appliance name and the event type. 
-In case the event is a `running` event, it will also report the **current** running time (in seconds) and the **current** energy consumption of the cycle (in kWh) since it started. 
+In case the event is a `running` event, it will also report the **current** running time (in seconds) and the **current** energy consumption of the cycle (in kWh) since it started, as well as the `energy_delta` in kWh since last update. 
 In case the event is a `stop` event, it will also report the **total** time (in seconds) and the **total** energy consumption of the cycle (in kWh). Examples:
 
 `{ "name": "washer", "event": "start" }`
 
-`{ "name": "washer", "event": "running", "time": 4500, "energy": 0.05 }`
+`{ "name": "washer", "event": "running", "time": 4500, "energy": 0.05, "energy_delta": 0.009 }`
 
 `{ "name": "washer", "event": "stop", "time": 8800, "energy": 0.14 }`
 
