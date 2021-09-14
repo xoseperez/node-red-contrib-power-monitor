@@ -125,6 +125,15 @@
             if (3 === node.state) {
                 if (above) {
                     node.energy = node.energy + energy;
+                    node.send([
+                        { "payload": {
+                            "name": node.name,
+                            "event": "running",
+                            "time": Math.round(time - node.start),
+                            "energy": kwh(node.energy)
+                        }},
+                        null
+                    ]);
                 } else {
                     node.count = 0;
                     node.state = 4;
