@@ -104,6 +104,16 @@
                 if (above) {
                     node.energy = node.energy + energy;
                     node.count = node.count + 1;
+                    node.send([
+                        { "payload": {
+                            "name": node.name,
+                            "event": "pre_start",
+                            "time": Math.round(time - node.start),
+                            "energy": kwh(node.energy),
+                            "energy_delta": kwh(energy)    
+                        }},
+                        null
+                    ]);
                     if (node.count >= node.startafter) node.state = 2;
                 } else {
                     node.state = 0;
