@@ -61,7 +61,7 @@ Examples:
 
 `{ "name": "washer", "event": "running", "time": 4500, "energy": 0.05, "energy_delta": 0.009 }`
 
-`{ "name": "washer", "event": "stop", "time": 8800, "energy": 0.14 }`
+`{ "name": "washer", "event": "stop", "time": 8800, "energy": 0.14, "energy_delta": 0.020 }`
 
 
 ## Contribute
