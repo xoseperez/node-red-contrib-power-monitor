@@ -34,6 +34,10 @@
         <label for="node-input-stopafter"><i class="fa fa-stop"></i> Stop after</label>
         <input type="number" min="1" id="node-input-stopafter" placeholder="1">
     </div>
+    <div class="form-row">
+        <label for="node-input-cycles"><i class="fa fa-refresh"></i> Cycles</label>
+        <input type="number" min="1" id="node-input-cycles" placeholder="1">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="power-monitor">
@@ -47,6 +51,7 @@
         The node assumes the input value is the average power consumption since the last input. You will have to feed the node regularly (every minute, for instance).
         It will trigger an event when the appliance starts or stops (think of a washer machine, for instance) based on a power threshold and time span.
         On stop it will also append the total time and energy consumption.
+        If cycles is > 1 then stop will only occur after the specified number of starts.
     </p>
 
     <p>
@@ -66,7 +71,8 @@
             name: {value: ""},
             threshold: {value: 0},
             startafter: {value: 1},
-            stopafter: {value: 1}
+            stopafter: {value: 1},
+            cycles: {value: 1}
         },
         color:"#FFCC66",
         inputs: 1,
@@ -85,6 +91,7 @@
             this.threshold = this.threshold || 0;
             this.startafter = this.startafter || 1;
             this.stopafter = this.stopafter || 1;
+            this.cycles = this.cycles || 1;
         }
     });
 </script>

@@ -55,10 +55,11 @@
         // 3: running
         // 4: pre-stop (less than stopafter readings below threshold)
         // 5: stop
+        // 6: wait next cycle
         this.state = 0;
 
         // color for each status
-        this.colors = ["red", "blue", "green", "green", "yellow", "red"];
+        this.colors = ["red", "blue", "green", "green", "yellow", "red", "blue"];
 
         // Holds the number of readings above/below threshold for states 1 and 3
         this.count = 0;
@@ -71,6 +72,9 @@
 
         // Holds the total energy for this cycle
         this.energy = 0;
+     
+        // Holds the number of cycles left
+        this.cyclesleft = 0;
 
         // Initial state
         this.status({fill: node.colors[node.state], shape:"dot"});
@@ -96,6 +100,7 @@
                     node.energy = 0;
                     node.count = 0;
                     node.state = 1;
+                    node.cyclesleft = Number(config.cycles || 1) - 1;
                 }
             }
 
@@ -157,7 +162,13 @@
                     node.state = 3;
                 } else {
                     node.count = node.count + 1;
-                    if (node.count >= node.stopafter) node.state = 5;
+                    if (node.count >= node.stopafter) {
+                        if (node.cyclesleft > 0) {
+                            node.state = 6;
+                        } else {
+                            node.state = 5;
+                        }
+                    }
                 }
             }
 
@@ -172,6 +183,20 @@
                         "energy": kwh(node.energy)
                     }}
                 ]);
+            }
+         
+            // State machine - WAIT NEXT CYCLE
+            if (6 === node.state) {
+                node.energy = node.energy + energy;
+                if (above) {
+                    node.count = node.count + 1;
+                    if (node.count >= node.startafter) {
+                        node.cyclesleft -= 1;
+                        node.state = 3;
+                    }
+                } else {
+                    node.count = 0;
+                }
             }
 
             // Status
