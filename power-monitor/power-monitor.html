@@ -23,12 +23,16 @@
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-input-threshold"><i class="fa fa-thumbs-o-up"></i> Threshold</label>
-        <input type="number" id="node-input-threshold" placeholder="0">
+        <label for="node-input-startthreshold"><i class="fa fa-thumbs-o-up"></i> Start threshold</label>
+        <input type="number" id="node-input-startthreshold" placeholder="0">
     </div>
     <div class="form-row">
         <label for="node-input-startafter"><i class="fa fa-play"></i> Start after</label>
         <input type="number" min="1" id="node-input-startafter" placeholder="1">
+    </div>
+    <div class="form-row">
+        <label for="node-input-stopthreshold"><i class="fa fa-thumbs-o-up"></i> Stop threshold</label>
+        <input type="number" id="node-input-stopthreshold" placeholder="0">
     </div>
     <div class="form-row">
         <label for="node-input-stopafter"><i class="fa fa-stop"></i> Stop after</label>
@@ -46,7 +50,7 @@
         Monitors the activity of a home appliance based on the power (W) it consumes.
         The node assumes the input value is the average power consumption since the last input. You will have to feed the node regularly (every minute, for instance).
         It will trigger an event when the appliance starts or stops (think of a washer machine, for instance) based on a power threshold and time span.
-        On stop it will also append the total time and energy consumption.
+        On every event it will also append the total time and energy consumption since it started.
     </p>
 
     <p>
@@ -64,15 +68,16 @@
         category: "analysis",
         defaults: {
             name: {value: ""},
-            threshold: {value: 0},
+            startthreshold: {value: 0},
+            stopthreshold: {value: 0},
             startafter: {value: 1},
             stopafter: {value: 1}
         },
         color:"#FFCC66",
         inputs: 1,
-        outputs: 2,
+        outputs: 1,
         inputLabels: "power (W)",
-        outputLabels: ["start event","stop event"],
+        outputLabels: ["event"],
         icon: "power-monitor.png",
         label: function() {
             return this.name || "power-monitor";
@@ -82,8 +87,9 @@
         },
         oneditprepare: function() {
             this.name = this.name || "";
-            this.threshold = this.threshold || 0;
+            this.startthreshold = this.startthreshold || 0;
             this.startafter = this.startafter || 1;
+            this.stopthreshold = this.stopthreshold || 0;
             this.stopafter = this.stopafter || 1;
         }
     });

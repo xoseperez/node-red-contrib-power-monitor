@@ -44,8 +44,9 @@
         var node = this;
 
         this.name = config.name || "";
-        this.threshold = Number(config.threshold || 0);
+        this.startthreshold = Number(config.startthreshold || 0);
         this.startafter = Number(config.startafter || 1);
+        this.stopthreshold = Number(config.stopthreshold || 0);
         this.stopafter = Number(config.stopafter || 1);
 
         // States:
@@ -78,20 +79,18 @@
         this.on("input", function(msg) {
 
             // Get the current power
+            var event_type = null;
             var power = Number(msg.payload || 0);
-            var above = (power > node.threshold);
             var now = new Date();
             var time = now.getTime() / 1000;
             var energy = 0;
             if (node.latest > 0) energy = (time - node.latest) * power;
+            node.energy = node.energy + energy;
             node.latest = time;
-
-            if (2 === node.state) node.state = 3;
-            if (5 === node.state) node.state = 0;
 
             // State machine - IDLE
             if (0 === node.state) {
-                if (above) {
+                if (power > node.startthreshold) {
                     node.start = time;
                     node.energy = 0;
                     node.count = 0;
@@ -101,50 +100,24 @@
 
             // State machine - PRE-START
             if (1 === node.state) {
-                if (above) {
-                    node.energy = node.energy + energy;
+                if (power > node.startthreshold) {
                     node.count = node.count + 1;
-                    node.send([
-                        { "payload": {
-                            "name": node.name,
-                            "event": "pre_start",
-                            "time": Math.round(time - node.start),
-                            "energy": kwh(node.energy),
-                            "energy_delta": kwh(energy)    
-                        }},
-                        null
-                    ]);
                     if (node.count >= node.startafter) node.state = 2;
+                    event_type = "pre_start";
                 } else {
-                    node.state = 0;
+                    node.state = 0; 
                 }
             }
 
             // State machine - START
             if (2 === node.state) {
-                node.send([
-                    { "payload": {
-                        "name": node.name,
-                        "event": "start"
-                    }},
-                    null
-                ]);
+                event_type = "start";
             }
 
             // State machine - RUNNING
             if (3 === node.state) {
-                if (above) {
-                    node.energy = node.energy + energy;
-                    node.send([
-                        { "payload": {
-                            "name": node.name,
-                            "event": "running",
-                            "time": Math.round(time - node.start),
-                            "energy": kwh(node.energy),
-                            "energy_delta": kwh(energy)    
-                        }},
-                        null
-                    ]);
+                if (power > node.stopthreshold) {
+                    event_type = "running";
                 } else {
                     node.count = 0;
                     node.state = 4;
@@ -153,7 +126,7 @@
 
             // State machine - PRE-STOP
             if (4 === node.state) {
-                if (above) {
+                if (power > node.stopthreshold) {
                     node.state = 3;
                 } else {
                     node.count = node.count + 1;
@@ -163,15 +136,20 @@
 
             // State machine - STOP
             if (5 === node.state) {
-                node.send([
-                    null,
+                event_type = "stop";
+            }
+
+            // Send event
+            if (event_type) {
+                node.send(
                     { "payload": {
                         "name": node.name,
-                        "event": "stop",
+                        "event": event_type,
                         "time": Math.round(time - node.start),
-                        "energy": kwh(node.energy)
+                        "energy": kwh(node.energy),
+                        "energy_delta": kwh(energy)    
                     }}
-                ]);
+                );
             }
 
             // Status
@@ -180,6 +158,12 @@
             } else {
                 node.status({fill: node.colors[node.state], shape:"dot", text: pretty_time(time - node.start) + kwh(node.energy) + "kWh"});
             }
+
+            // Delayed state transitions.
+            // This state machine uses a chained state (a previous state change can be executed on the same cycle).
+            // This works good except for some state changes that must happen after all state checks.
+            if (2 === node.state) node.state = 3;
+            if (5 === node.state) node.state = 0;
 
         });
     }

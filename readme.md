@@ -41,8 +41,9 @@ The node will trigger events based on the start and stop conditions with additio
 ### Configuration
 
 - `Name`: Name of the appliance. Will be attached to the output object.
-- `Power threshold`: Value (in watts) to tell whether the appliance is running or not, an ideal value would be 0 (0W if not running).
+- `Start threshold`: Value (in watts) to tell whether the appliance is running, an ideal value would be 0 (0W if not running).
 - `Start after`: Number of messages with readings over the threshold to trigger a start event.
+- `Stop threshold`: Value (in watts) to tell whether the appliance has finished, an ideal value would be 0 (0W if not running).
 - `Stop after`: Number of messages with readings below the threshold to trigger a stop event.
 
 
@@ -54,7 +55,7 @@ The output will be a JSON object with the appliance name and the event type.
 
 Examples:
 
-`{ "name": "washer", "event": "start" }`
+`{ "name": "washer", "event": "start", "time": 0, "energy": 0, "energy_delta": 0 }`
 
 `{ "name": "washer", "event": "pre_start", "time": 100, "energy": 0.003, "energy_delta": 0.002 }`
 
