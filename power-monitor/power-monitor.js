@@ -105,7 +105,7 @@
                     if (node.count >= node.startafter) node.state = 2;
                     event_type = "pre_start";
                 } else {
-                    node.state = 0; 
+                    node.state = 4; 
                 }
             }
 
