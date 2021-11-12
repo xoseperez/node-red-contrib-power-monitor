@@ -37,6 +37,9 @@ npm install node-red-contrib-power-monitor
 Feed the node regularly with a real number as payload representing the average consumption in Watts since the last message.
 The node will trigger events based on the start and stop conditions with additional information like the total energy consumption for the last cycle.
 
+### Notice
+
+Latest version (1.0.0) is not backwards compatible with previous ones (0.X.X). The most important change is that we have just one output for all the different events instead of 2 outputs for start and stop events. Therefore, you will have to add a switch node the the output to filter the type of message you want to process using the `event` property of the `payload` object. You can use the same node to redirect different type of events to different sub-flows.
 
 ### Configuration
 
