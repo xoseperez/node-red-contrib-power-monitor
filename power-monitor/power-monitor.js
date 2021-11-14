@@ -144,7 +144,7 @@
                 node.send(
                     { "payload": {
                         "name": node.name,
-						                  "power": power, // Sends power (watts) as received in previous node to next node.
+			"power": power, // Sends power (watts) as received in previous node to next node.
                         "event": event_type,
                         "time": Math.round(time - node.start),
                         "energy": kwh(node.energy),
@@ -152,15 +152,15 @@
                     }}
                 );
             }
-			else {
+            else {
                 node.send(
                     { "payload": {
                         "name": node.name,
-						                  "power": power, // Sends power (watts) as received in previous node to next node. PR Update 12-Nov-21 Scott Wilson
+			"power": power, // Sends power (watts) as received in previous node to next node. PR Update 12-Nov-21 Scott Wilson
                         "event": "idle"    
                     }}
                 );			
-			}			
+            }			
 
             // Status
             if (0 == node.state) {
