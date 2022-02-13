@@ -18,8 +18,8 @@
 
     "use strict";
 
-    function kwh(value) {
-        return Math.round(value / 360) / 10000;
+    function kwh(value, energydecimals) {
+        return parseFloat(Number(value / 360 / 10000).toFixed(energydecimals));
     }
 
     function pretty_time(seconds) {
@@ -48,6 +48,7 @@
         this.startafter = Number(config.startafter || 1);
         this.stopthreshold = Number(config.stopthreshold || 0);
         this.stopafter = Number(config.stopafter || 1);
+        this.energydecimals = Number(config.energydecimals || 0);
 
         // States:
         // 0: idle
@@ -142,28 +143,29 @@
             // Send event
             if (event_type) {
                 node.send(
-                    { "payload": {
-                        "name": node.name,
-			"power": power, // Sends power (watts) as received in previous node to next node.
-                        "event": event_type,
-                        "time": Math.round(time - node.start),
-                        "energy": kwh(node.energy),
-                        "energy_delta": kwh(energy)    
+                    { 
+                        "payload": {
+                            "name": node.name,
+                            "power": power, // Sends power (watts) as received in previous node to next node.
+                            "event": event_type,
+                            "time": Math.round(time - node.start),
+                            "energy": kwh(node.energy, node.energydecimals),
+                            "energy_delta": kwh(energy, node.energydecimals)
+                    }}
+                );
+            } else {
+                node.send(
+                    { 
+                        "payload": {
+                            "name": node.name,
+                            "power": power, // Sends power (watts) as received in previous node to next node. PR Update 12-Nov-21 Scott Wilson
+                            "event": "idle"
                     }}
                 );
             }
-            else {
-                node.send(
-                    { "payload": {
-                        "name": node.name,
-			"power": power, // Sends power (watts) as received in previous node to next node. PR Update 12-Nov-21 Scott Wilson
-                        "event": "idle"    
-                    }}
-                );			
-            }			
 
             // Status
-            if (0 == node.state) {
+            if (0 === node.state) {
                 node.status({fill: node.colors[node.state], shape:"dot"});
             } else {
                 node.status({fill: node.colors[node.state], shape:"dot", text: pretty_time(time - node.start) + kwh(node.energy) + "kWh"});

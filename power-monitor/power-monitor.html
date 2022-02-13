@@ -38,6 +38,10 @@
         <label for="node-input-stopafter"><i class="fa fa-stop"></i> Stop after</label>
         <input type="number" min="1" id="node-input-stopafter" placeholder="1">
     </div>
+    <div class="form-row">
+        <label for="node-input-energydecimals">Round decimals</label>
+        <input type="number" min="0" id="node-input-energydecimals" placeholder="0">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="power-monitor">
@@ -51,6 +55,7 @@
         The node assumes the input value is the average power consumption since the last input. You will have to feed the node regularly (every minute, for instance).
         It will trigger an event when the appliance starts or stops (think of a washer machine, for instance) based on a power threshold and time span.
         On every event it will also append the total time and energy consumption since it started.
+        Reported energy will be rounded to decimals configured.
     </p>
 
     <p>
@@ -71,7 +76,8 @@
             startthreshold: {value: 0},
             stopthreshold: {value: 0},
             startafter: {value: 1},
-            stopafter: {value: 1}
+            stopafter: {value: 1},
+            energydecimals: {value: 0}
         },
         color:"#FFCC66",
         inputs: 1,
@@ -91,6 +97,7 @@
             this.startafter = this.startafter || 1;
             this.stopthreshold = this.stopthreshold || 0;
             this.stopafter = this.stopafter || 1;
+            this.energydecimals = this.energydecimals || 0;
         }
     });
 </script>
