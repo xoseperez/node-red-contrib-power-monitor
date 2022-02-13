@@ -49,6 +49,7 @@
         this.stopthreshold = Number(config.stopthreshold || 0);
         this.stopafter = Number(config.stopafter || 1);
         this.energydecimals = Number(config.energydecimals || 0);
+        this.emitidle = Boolean(config.emitidle || false);
 
         // States:
         // 0: idle
@@ -153,13 +154,14 @@
                             "energy_delta": kwh(energy, node.energydecimals)
                     }}
                 );
-            } else {
+            } else if (node.emitidle) {
                 node.send(
                     { 
                         "payload": {
                             "name": node.name,
                             "power": power, // Sends power (watts) as received in previous node to next node. PR Update 12-Nov-21 Scott Wilson
-                            "event": "idle"
+                            "event": "idle",
+                            "energy_delta": 0
                     }}
                 );
             }
