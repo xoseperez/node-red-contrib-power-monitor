@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Xose Pérez <xose.perez@gmail.com>
+ * Copyright (c) 2018-2022 Xose Pérez <xose.perez@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@
         this.startafter = Number(config.startafter || 1);
         this.stopthreshold = Number(config.stopthreshold || 0);
         this.stopafter = Number(config.stopafter || 1);
-        this.energydecimals = Number(config.energydecimals || 0);
+        this.energydecimals = Number(config.energydecimals || 4);
         this.emitidle = Boolean(config.emitidle || false);
 
         // States:
