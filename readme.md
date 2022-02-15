@@ -17,6 +17,7 @@ A [Node-RED](http://nodered.org) node to monitor home appliances based on their 
 * [Usage](#usage)
   * [Configuration](#configuration)
   * [Output](#output)
+  * [Suggestions](#suggestions)
 * [Bugs / Feature request](#bugs--feature-request)
 * [License](#license)
 * [Contribute](#contribute)
@@ -46,26 +47,37 @@ Latest version (1.0.0) is not backwards compatible with previous ones (0.X.X). T
 - `Name`: Name of the appliance. Will be attached to the output object.
 - `Start threshold`: Value (in watts) to tell whether the appliance is running, an ideal value would be 0 (0W if not running).
 - `Start after`: Number of messages with readings over the threshold to trigger a start event.
-- `Stop threshold`: Value (in watts) to tell whether the appliance has finished, an ideal value would be 0 (0W if not running).
+- `Stop threshold`: Value (in watts) to tell whether the device has finished, an ideal value would be 0 (0W if not running).
 - `Stop after`: Number of messages with readings below the threshold to trigger a stop event.
 
 
 ### Output
 
-The output will be a JSON object with the appliance name and the event type. 
+The output will be a JSON object with the device name and the event type. 
 - In case the event is a `pre_start` or `running` event, it will also report the **current** running time (in seconds) and the **current** energy consumption of the cycle (in kWh) since it started, as well as the `energy_delta` in kWh since last update. 
-- In case the event is a `stop` event, it will also report the **total** time (in seconds) and the **total** energy consumption of the cycle (in kWh). 
+- In case the event is a `stop` event, it will also report the **total** time (in seconds) and the **total** energy consumption of the cycle (in kWh).
+- The input power (Watts) and device name (the name you gave to this node) will always be fed to the output for every input. Knowing the power gives you the capability of discovering in which particular cycle a washing machine is in (ie: Washing, Draining, Rinse Cycle, etc). For a clothes dryer that contains a light bulb you can determine if someone opened the door to check the clothes as the power will drop to whatever wattage the light bulb is. Knowing this would allow you to write downline functions that could show `paused` for example.
+- The `idle` event allows downstream nodes to receive their first feed soon after a reboot.
 
 Examples:
 
-`{ "name": "washer", "event": "start", "time": 0, "energy": 0, "energy_delta": 0 }`
+`{ "name": "washer", "power": 8, "event": "start", "time": 0, "energy": 0, "energy_delta": 0 }`
 
-`{ "name": "washer", "event": "pre_start", "time": 100, "energy": 0.003, "energy_delta": 0.002 }`
+`{ "name": "washer", "power": 8, "event": "pre_start", "time": 100, "energy": 0.003, "energy_delta": 0.002 }`
 
-`{ "name": "washer", "event": "running", "time": 4500, "energy": 0.05, "energy_delta": 0.009 }`
+`{ "name": "washer", "power": 217, "event": "running", "time": 4500, "energy": 0.05, "energy_delta": 0.009 }`
 
-`{ "name": "washer", "event": "stop", "time": 8800, "energy": 0.14, "energy_delta": 0.020 }`
+`{ "name": "washer", "power": 0, "event": "stop", "time": 8800, "energy": 0.14, "energy_delta": 0.020 }`
 
+`{ "name": "washer", "power": 0, "event": "idle" }`
+
+### Suggestions
+
+The ideal popular device to use to capture power is a Sonoff S-31 or POW running Espurna firmware (Tasmota probably too). Set it up to report power perhaps every 30 or 60 seconds. 
+
+Place a timer or countdown node just in front of the power-monitor node. Set it to perhaps 45 or 90 seconds so that it will send 0 watts if nothing is received by the Sonoff device. This is useful when a power failure occurs and node-red is on a battery backup. Without this countdown node power-monitor will continue to accumulate time and energy if it was in a running state at the time of power outtage. Note that the countown node must send out JSON to mimick output from the S31 etc.
+
+At the completion of a stop event it is a good time to write the total seconds etc to a database.
 
 ## Contribute
 
