@@ -89,7 +89,10 @@
             var energy = 0;
 
             if(forceStop){
-                node.state = 5
+                power = 0;
+                if(0 !== node.state){
+                    node.state = 5
+                }
             }
             else{
                 if (node.latest > 0) energy = (time - node.latest) * power;
