@@ -82,13 +82,23 @@
 
             // Get the current power
             var event_type = null;
+            var forceStop = (msg.payload == "stop" || msg.payload == "STOP");
             var power = Number(msg.payload || 0);
             var now = new Date();
             var time = now.getTime() / 1000;
             var energy = 0;
-            if (node.latest > 0) energy = (time - node.latest) * power;
-            node.energy = node.energy + energy;
-            node.latest = time;
+
+            if(forceStop){
+                power = 0;
+                if(0 !== node.state){
+                    node.state = 5
+                }
+            }
+            else{
+                if (node.latest > 0) energy = (time - node.latest) * power;
+                node.energy = node.energy + energy;
+                node.latest = time;
+            }
 
             // State machine - IDLE
             if (0 === node.state) {
@@ -151,7 +161,8 @@
                             "event": event_type,
                             "time": Math.round(time - node.start),
                             "energy": kwh(node.energy, node.energydecimals),
-                            "energy_delta": kwh(energy, node.energydecimals)
+                            "energy_delta": kwh(energy, node.energydecimals),
+                            "forced_stop": forceStop
                     }}
                 );
             } else if (node.emitidle) {

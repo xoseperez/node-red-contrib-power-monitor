@@ -50,6 +50,10 @@ Latest version (1.0.0) is not backwards compatible with previous ones (0.X.X). T
 - `Stop threshold`: Value (in watts) to tell whether the device has finished, an ideal value would be 0 (0W if not running).
 - `Stop after`: Number of messages with readings below the threshold to trigger a stop event.
 
+### Input
+Two valid input options:
+- The number of the average watts since last message.
+- Passing `stop` will force a stoppd state, overriding the `Stop threshold` and `Stop after` requirements.
 
 ### Output
 
@@ -75,7 +79,7 @@ Examples:
 
 The ideal popular device to use to capture power is a Sonoff S-31 or POW running Espurna firmware (Tasmota probably too). Set it up to report power perhaps every 30 or 60 seconds. 
 
-Place a timer or countdown node just in front of the power-monitor node. Set it to perhaps 45 or 90 seconds so that it will send 0 watts if nothing is received by the Sonoff device. This is useful when a power failure occurs and node-red is on a battery backup. Without this countdown node power-monitor will continue to accumulate time and energy if it was in a running state at the time of power outtage. Note that the countown node must send out JSON to mimick output from the S31 etc.
+Place a timer or countdown node just in front of the power-monitor node. Set it to perhaps 45 or 90 seconds so that it will send 0 or `stop` if nothing is received by the hardware power monitor device. This is useful when the power monitor loses power/is switched off while the power-monitor node is not in a idle state and node-red is still running. Without this countdown node power-monitor will continue to accumulate time and energy if it was in a running state at the time of power outtage. Note that the countown node must send out 0 or `stop`, 0 will adhear to the the `Stop threshold` and `Stop after`, passing `stop` will force a stopped state.
 
 At the completion of a stop event it is a good time to write the total seconds etc to a database.
 
