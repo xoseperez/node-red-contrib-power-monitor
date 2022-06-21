@@ -50,6 +50,8 @@
         this.stopafter = Number(config.stopafter || 1);
         this.energydecimals = Number(config.energydecimals || 4);
         this.emitidle = Boolean(config.emitidle || false);
+        this.startperiodtype = Number(config.startperiodtype || 1);
+        this.stopperiodtype = Number(config.stopperiodtype || 1);
 
         // States:
         // 0: idle
@@ -70,7 +72,10 @@
         this.latest = 0;
 
         // Holds the starting time (the first reading above threshold for a valid cycle)
-        this.start = 0;
+        this.starttime = 0;
+
+        // Holds the beginging of the prestop
+        this.stoptime = 0
 
         // Holds the total energy for this cycle
         this.energy = 0;
@@ -82,6 +87,7 @@
 
             // Get the current power
             var event_type = null;
+            var event_reason = null;
             var forceStop = (msg.payload == "stop" || msg.payload == "STOP");
             var power = Number(msg.payload || 0);
             var now = new Date();
@@ -103,7 +109,7 @@
             // State machine - IDLE
             if (0 === node.state) {
                 if (power > node.startthreshold) {
-                    node.start = time;
+                    node.starttime = time;
                     node.energy = 0;
                     node.count = 0;
                     node.state = 1;
@@ -113,8 +119,21 @@
             // State machine - PRE-START
             if (1 === node.state) {
                 if (power > node.startthreshold) {
-                    node.count = node.count + 1;
-                    if (node.count >= node.startafter) node.state = 2;
+                    if(this.startperiodtype == 2 ){
+                        //time based start
+                        if ((time - node.starttime) >= node.startafter) {
+                            node.state = 2;
+                            event_reason = "startafter " + node.startafter + "s less than " + (time - node.starttime);
+                        }
+                    }
+                    else{
+                        //readings count based start
+                        node.count = node.count + 1;
+                        if (node.count >= node.startafter) {
+                            node.state = 2;
+                            event_reason = "count " + node.count + " greater than " + node.startafter;
+                        }
+                    }
                     event_type = "pre_start";
                 } else {
                     node.state = 0; 
@@ -132,6 +151,7 @@
                     event_type = "running";
                 } else {
                     node.count = 0;
+                    node.stoptime = time;
                     node.state = 4;
                 }
             }
@@ -141,8 +161,22 @@
                 if (power > node.stopthreshold) {
                     node.state = 3;
                 } else {
-                    node.count = node.count + 1;
-                    if (node.count >= node.stopafter) node.state = 5;
+                    if(this.stopperiodtype == 2 ){
+                        //readings based stop
+                        if ((time - node.stoptime) >= node.stopafter) {
+                            node.state = 5;
+                            event_reason = "stopafter " + node.stopafter + "s less than " + (time - node.stoptime);
+                        }
+                    }
+                    else{
+                        //message count based stop
+                        node.count = node.count + 1;
+                        if (node.count >= node.stopafter) {
+                            node.state = 5;
+                            event_reason = "count " + node.count + " greater than " + node.stopafter;
+                        }
+                    }
+                    event_type = "pre_stop";
                 }
             }
 
@@ -159,7 +193,8 @@
                             "name": node.name,
                             "power": power, // Sends power (watts) as received in previous node to next node.
                             "event": event_type,
-                            "time": Math.round(time - node.start),
+                            "event_reason": event_reason,
+                            "time": Math.round(time - node.starttime),
                             "energy": kwh(node.energy, node.energydecimals),
                             "energy_delta": kwh(energy, node.energydecimals),
                             "forced_stop": forceStop
