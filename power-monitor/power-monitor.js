@@ -143,6 +143,7 @@
                 } else {
                     node.count = node.count + 1;
                     if (node.count >= node.stopafter) node.state = 5;
+                    event_type = "pre_stop"
                 }
             }
 
