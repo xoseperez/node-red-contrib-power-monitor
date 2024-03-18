@@ -48,6 +48,12 @@
             <input type="checkbox" id="node-input-emitidle" style="display: inline-block; width: auto; vertical-align: top;">
         </div>
     </div>
+    <div class="form-row">
+        <div style="display: inline;">
+            <label for="node-input-preserve-msg-props" style="width: 120px;">Preserve msg properties</label>
+            <input type="checkbox" id="node-input-preserve-msg-props" style="display: inline-block; width: auto; vertical-align: top;">
+        </div>
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="power-monitor">
@@ -75,6 +81,7 @@
         <li>Stop after - message count to wait before firing stop</li>
         <li>Round decimals - decimals for ouput of energy cosnuption</li>
         <li>You can configure the node to emit idle status (in case the incoming power is zero).</li>
+        <li>Preserve msg properties - use input msg for output, putting the output JSON object into the "payload" property.</li>
     </ul>
 
     <p>
@@ -99,7 +106,8 @@
             startafter: {value: 1},
             stopafter: {value: 1},
             energydecimals: {value: 4},
-            emitidle: {value: false}
+            emitidle: {value: false},
+            preservemsg: {value: false}
         },
         color:"#FFCC66",
         inputs: 1,
@@ -121,6 +129,7 @@
             this.stopafter = this.stopafter || 1;
             this.energydecimals = this.energydecimals || 4;
             this.emitidle = this.emitidle || false;
+            this.preservemsg = this.preservemsg || false;
         }
     });
 </script>
