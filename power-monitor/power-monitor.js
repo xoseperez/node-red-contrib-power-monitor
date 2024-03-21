@@ -50,6 +50,7 @@
         this.stopafter = Number(config.stopafter || 1);
         this.energydecimals = Number(config.energydecimals || 4);
         this.emitidle = Boolean(config.emitidle || false);
+        this.preservemsg = Boolean(config.preservemsg || false);
 
         // States:
         // 0: idle
@@ -87,6 +88,7 @@
             var now = new Date();
             var time = now.getTime() / 1000;
             var energy = 0;
+            var outobj;
 
             if(forceStop){
                 power = 0;
@@ -153,29 +155,26 @@
             }
 
             // Send event
+            outobj = node.preservemsg ? msg : {};
             if (event_type) {
-                node.send(
-                    { 
-                        "payload": {
-                            "name": node.name,
-                            "power": power, // Sends power (watts) as received in previous node to next node.
-                            "event": event_type,
-                            "time": Math.round(time - node.start),
-                            "energy": kwh(node.energy, node.energydecimals),
-                            "energy_delta": kwh(energy, node.energydecimals),
-                            "forced_stop": forceStop
-                    }}
-                );
+                outobj.payload = {
+                    "name": node.name,
+                    "power": power, // Sends power (watts) as received in previous node to next node.
+                    "event": event_type,
+                    "time": Math.round(time - node.start),
+                    "energy": kwh(node.energy, node.energydecimals),
+                    "energy_delta": kwh(energy, node.energydecimals),
+                    "forced_stop": forceStop
+                };
+                node.send(outobj);
             } else if (node.emitidle) {
-                node.send(
-                    { 
-                        "payload": {
-                            "name": node.name,
-                            "power": power, // Sends power (watts) as received in previous node to next node. PR Update 12-Nov-21 Scott Wilson
-                            "event": "idle",
-                            "energy_delta": 0
-                    }}
-                );
+                outobj.payload = {
+                    "name": node.name,
+                    "power": power, // Sends power (watts) as received in previous node to next node. PR Update 12-Nov-21 Scott Wilson
+                    "event": "idle",
+                    "energy_delta": 0
+                };
+                node.send(outobj);
             }
 
             // Status

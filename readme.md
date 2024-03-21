@@ -49,6 +49,7 @@ Latest version (1.0.0) is not backwards compatible with previous ones (0.X.X). T
 - `Start after`: Number of messages with readings over the threshold to trigger a start event.
 - `Stop threshold`: Value (in watts) to tell whether the device has finished, an ideal value would be 0 (0W if not running).
 - `Stop after`: Number of messages with readings below the threshold to trigger a stop event.
+- `Preserve msg properties`: Use the input msg for output, putting the output JSON object into the "payload" property.
 
 ### Input
 Two valid input options:
